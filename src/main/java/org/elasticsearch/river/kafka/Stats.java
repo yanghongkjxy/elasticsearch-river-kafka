@@ -40,7 +40,7 @@ public class Stats {
         clone.succeeded.set(succeeded.getAndSet(0));
         clone.flushCount.set(flushCount.getAndSet(0));
         clone.messagesReceived.set(messagesReceived.getAndSet(0));
-        
+
         clone.lastCommitOffsetByPartitionId.putAll(lastCommitOffsetByPartitionId);
         lastCommitOffsetByPartitionId.clear();
 
@@ -49,8 +49,7 @@ public class Stats {
 
     @Override
     public String toString() {
-        return String.format(
-                "[failed=%s, succeeded=%s, flushCount=%s, messagesReceived=%s, lastCommitOffset=%s]",
+        return String.format("[failed=%s, succeeded=%s, flushCount=%s, messagesReceived=%s, lastCommitOffset=%s]",
                 failed.get(), succeeded.get(), flushCount.get(), messagesReceived.get(), lastCommitOffsetByPartitionId);
     }
 }

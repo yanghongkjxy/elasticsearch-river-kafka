@@ -28,12 +28,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-
 /**
- * The worker thread, which does the actual job of consuming messages from kafka and passing those to
- * Elastic Search producer - {@link ElasticSearchProducer} to index.
- * Behind the scenes of kafka high level API, the worker will read the messages from different kafka brokers and
- * partitions.
+ * The worker thread, which does the actual job of consuming messages from kafka and passing those to Elastic Search
+ * producer - {@link ElasticSearchProducer} to index. Behind the scenes of kafka high level API, the worker will read
+ * the messages from different kafka brokers and partitions.
  */
 public class KafkaWorker implements Runnable {
 
@@ -51,11 +49,8 @@ public class KafkaWorker implements Runnable {
      */
     private Random random = new Random();
 
-
-    public KafkaWorker(final KafkaConsumer kafkaConsumer,
-                       final ElasticSearchProducer elasticsearchProducer,
-                       final RiverConfig riverConfig,
-                       final Stats stats) {
+    public KafkaWorker(final KafkaConsumer kafkaConsumer, final ElasticSearchProducer elasticsearchProducer,
+            final RiverConfig riverConfig, final Stats stats) {
         this.kafkaConsumer = kafkaConsumer;
         this.elasticsearchProducer = elasticsearchProducer;
         this.riverConfig = riverConfig;
@@ -68,7 +63,8 @@ public class KafkaWorker implements Runnable {
         logger.debug("Index: {}: Kafka worker started...", riverConfig.getIndexName());
 
         if (consume) {
-            logger.debug("Index: {}: Consumer is already running, new one will not be started...", riverConfig.getIndexName());
+            logger.debug("Index: {}: Consumer is already running, new one will not be started...",
+                    riverConfig.getIndexName());
             return;
         }
 

@@ -21,6 +21,8 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.xcontent.XContentFactory;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -37,8 +39,8 @@ public class IndexDocumentProducer extends ElasticSearchProducer {
     }
 
     /**
-     * For the given messages creates index document requests and adds them to the bulk processor queue, for
-     * processing later when the size of bulk actions is reached.
+     * For the given messages creates index document requests and adds them to the bulk processor queue, for processing
+     * later when the size of bulk actions is reached.
      *
      * @param messageAndMetadata given message
      */
@@ -46,7 +48,8 @@ public class IndexDocumentProducer extends ElasticSearchProducer {
 
         final byte[] messageBytes = (byte[]) messageAndMetadata.message();
 
-        if (messageBytes == null || messageBytes.length == 0) return;
+        if (messageBytes == null || messageBytes.length == 0)
+            return;
 
         try {
             // TODO - future improvement - support for protobuf messages
@@ -56,20 +59,14 @@ public class IndexDocumentProducer extends ElasticSearchProducer {
 
             switch (riverConfig.getMessageType()) {
                 case STRING:
-                    message = XContentFactory.jsonBuilder()
-                            .startObject()
-                            .field("value", new String(messageBytes, "UTF-8"))
-                            .endObject()
-                            .string();
-                    request = Requests.indexRequest(riverConfig.getIndexName()).
-                            type(riverConfig.getTypeName()).
-                            source(message);
+                    message = XContentFactory.jsonBuilder().startObject()
+                            .field("value", new String(messageBytes, "UTF-8")).endObject().string();
+                    request = Requests.indexRequest(riverConfig.getIndexName()).type(riverConfig.getTypeName())
+                            .source(message);
                     break;
                 case JSON:
                     final Map<String, Object> messageMap = reader.readValue(messageBytes);
-                    request = Requests.indexRequest(riverConfig.getIndexName()).
-                            type(riverConfig.getTypeName()).
-                            source(messageMap);
+                    request = Requests.indexRequest(riverConfig.getIndexName()).type(getType()).source(messageMap);
             }
 
             bulkProcessor.add(request);
@@ -77,4 +74,5 @@ public class IndexDocumentProducer extends ElasticSearchProducer {
             ex.printStackTrace();
         }
     }
+
 }

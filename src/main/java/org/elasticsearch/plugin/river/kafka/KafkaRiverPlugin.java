@@ -19,7 +19,6 @@ import org.elasticsearch.plugins.AbstractPlugin;
 import org.elasticsearch.river.RiversModule;
 import org.elasticsearch.river.kafka.KafkaRiverModule;
 
-
 public class KafkaRiverPlugin extends AbstractPlugin {
 
     @Override
@@ -34,20 +33,5 @@ public class KafkaRiverPlugin extends AbstractPlugin {
 
     public void onModule(RiversModule module) {
         module.registerRiver("kafka", KafkaRiverModule.class);
-
-        // Type "kafka" must always be the same value which you provide as a type when creating the river:
-        //Example:
-
-//        curl -XPUT 'localhost:9200/_river/my_kafka_river/_meta' -d '{
-//        "type" : "kafka",
-//                "kafka" : {
-//                "brokerHost" : "localhost",
-//                    "brokerPort" : 9092,
-//                    "topic" : "dummy",
-//                    "partition" : 0
-//
-//                }
-//        }'
     }
 }
-

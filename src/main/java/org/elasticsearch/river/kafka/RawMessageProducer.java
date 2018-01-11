@@ -35,8 +35,8 @@ public class RawMessageProducer extends ElasticSearchProducer {
     }
 
     /**
-     * Adds the given raw messages to the bulk processor queue, for processing later
-     * when the size of bulk actions is reached.
+     * Adds the given raw messages to the bulk processor queue, for processing later when the size of bulk actions is
+     * reached.
      *
      * @param messageAndMetadata given message
      */
@@ -44,11 +44,8 @@ public class RawMessageProducer extends ElasticSearchProducer {
         final byte[] messageBytes = (byte[]) messageAndMetadata.message();
         try {
             ByteBuffer byteBuffer = ByteBuffer.wrap(messageBytes);
-            bulkProcessor.add(
-                    new ChannelBufferBytesReference(new ByteBufferBackedChannelBuffer(byteBuffer)),
-                    riverConfig.getIndexName(),
-                    riverConfig.getTypeName()
-            );
+            bulkProcessor.add(new ChannelBufferBytesReference(new ByteBufferBackedChannelBuffer(byteBuffer)),
+                    riverConfig.getIndexName(), getType());
         } catch (Exception e) {
             e.printStackTrace();
         }

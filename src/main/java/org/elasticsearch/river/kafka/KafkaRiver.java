@@ -27,18 +27,19 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * This is the actual river implementation, which starts a thread to read messages from kafka and put them into elasticsearch.
+ * This is the actual river implementation, which starts a thread to read messages from kafka and put them into
+ * elasticsearch.
  */
 public class KafkaRiver extends AbstractRiverComponent implements River {
 
     private KafkaConsumer kafkaConsumer;
     private ElasticSearchProducer elasticsearchProducer;
     private RiverConfig riverConfig;
-    
+
     private Stats stats;
     private StatsAgent statsAgent;
     private Timer timer;
-    
+
     private Thread thread;
 
     @Inject
@@ -48,8 +49,8 @@ public class KafkaRiver extends AbstractRiverComponent implements River {
         riverConfig = new RiverConfig(riverName, riverSettings);
         kafkaConsumer = new KafkaConsumer(riverConfig);
         stats = new Stats();
-        
-        if(null != riverConfig.getStatsdHost()) {
+
+        if (null != riverConfig.getStatsdHost()) {
             logger.debug("Found statsd configuration. Starting client (prefix={}, host={}, port={}, interval={})",
                     riverConfig.getStatsdPrefix(), riverConfig.getStatsdHost(), riverConfig.getStatsdPort(),
                     riverConfig.getStatsdIntervalInSeconds());
@@ -59,8 +60,7 @@ public class KafkaRiver extends AbstractRiverComponent implements River {
             int intervalInMs = riverConfig.getStatsdIntervalInSeconds() * 1000;
             timer = new Timer();
             timer.scheduleAtFixedRate(new LogStatsTask(), intervalInMs, intervalInMs);
-        }
-        else {
+        } else {
             logger.debug("No statsd configuration found. Will not report stats...");
         }
 
@@ -84,7 +84,8 @@ public class KafkaRiver extends AbstractRiverComponent implements River {
             logger.debug("Index: {}: Starting Kafka River...", riverConfig.getIndexName());
             final KafkaWorker kafkaWorker = new KafkaWorker(kafkaConsumer, elasticsearchProducer, riverConfig, stats);
 
-            thread = EsExecutors.daemonThreadFactory(settings.globalSettings(), "Kafka River Worker").newThread(kafkaWorker);
+            thread = EsExecutors.daemonThreadFactory(settings.globalSettings(), "Kafka River Worker")
+                    .newThread(kafkaWorker);
             thread.start();
         } catch (Exception ex) {
             logger.error("Index: {}: Unexpected Error occurred", ex, riverConfig.getIndexName());
@@ -98,14 +99,14 @@ public class KafkaRiver extends AbstractRiverComponent implements River {
 
         elasticsearchProducer.closeBulkProcessor();
         kafkaConsumer.shutdown();
-        
-        if(null != timer) {
+
+        if (null != timer) {
             timer.cancel();
         }
 
         thread.interrupt();
     }
-    
+
     private class LogStatsTask extends TimerTask {
         @Override
         public void run() {

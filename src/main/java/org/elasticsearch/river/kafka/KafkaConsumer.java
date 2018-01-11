@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Kafka consumer, written using Kafka Consumer Group (High Level) API, opens kafka streams to be able to consume messages.
+ * Kafka consumer, written using Kafka Consumer Group (High Level) API, opens kafka streams to be able to consume
+ * messages.
  *
  * @author Mariam Hakobyan
  */
@@ -41,7 +42,6 @@ public class KafkaConsumer {
     private ConsumerConnector consumerConnector;
 
     private static final ESLogger logger = ESLoggerFactory.getLogger(KafkaConsumer.class.getName());
-
 
     public KafkaConsumer(final RiverConfig riverConfig) {
         consumerConnector = kafka.consumer.Consumer.createJavaConsumerConnector(createConsumerConfig(riverConfig));

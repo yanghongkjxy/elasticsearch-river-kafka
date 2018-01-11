@@ -42,13 +42,13 @@ public class RiverConfig {
     private static final String CONCURRENT_REQUESTS = "concurrent.requests";
     private static final String ACTION_TYPE = "action.type";
     private static final String FLUSH_INTERVAL = "flush.interval";
-    
+    private static final String FREQUENCY = "frequency";
+
     /* StatsD config */
     private static final String STATSD_PREFIX = "prefix";
     private static final String STATSD_HOST = "host";
     private static final String STATSD_PORT = "port";
     private static final String STATSD_INTERVAL_IN_SECONDS = "log.interval";
-
 
     private String zookeeperConnect;
     private int zookeeperConnectionTimeout;
@@ -60,14 +60,14 @@ public class RiverConfig {
     private int concurrentRequests;
     private ActionType actionType;
     private TimeValue flushInterval;
-    
+    private FrequencyType frequency;
+
     private String statsdPrefix;
     private String statsdHost;
     private int statsdPort;
     private int statsdIntervalInSeconds;
 
     private static final TimeValue FLUSH_12H = TimeValue.timeValueHours(12);
-
 
     public RiverConfig(RiverName riverName, RiverSettings riverSettings) {
 
@@ -77,9 +77,10 @@ public class RiverConfig {
 
             topic = (String) kafkaSettings.get(TOPIC);
             zookeeperConnect = XContentMapValues.nodeStringValue(kafkaSettings.get(ZOOKEEPER_CONNECT), "localhost");
-            zookeeperConnectionTimeout = XContentMapValues.nodeIntegerValue(kafkaSettings.get(ZOOKEEPER_CONNECTION_TIMEOUT), 10000);
-            messageType = MessageType.fromValue(XContentMapValues.nodeStringValue(kafkaSettings.get(MESSAGE_TYPE),
-                    MessageType.JSON.toValue()));
+            zookeeperConnectionTimeout =
+                    XContentMapValues.nodeIntegerValue(kafkaSettings.get(ZOOKEEPER_CONNECTION_TIMEOUT), 10000);
+            messageType = MessageType.fromValue(
+                    XContentMapValues.nodeStringValue(kafkaSettings.get(MESSAGE_TYPE), MessageType.JSON.toValue()));
         } else {
             zookeeperConnect = "localhost";
             zookeeperConnectionTimeout = 10000;
@@ -94,9 +95,12 @@ public class RiverConfig {
             typeName = XContentMapValues.nodeStringValue(indexSettings.get(MAPPING_TYPE), "status");
             bulkSize = XContentMapValues.nodeIntegerValue(indexSettings.get(BULK_SIZE), 100);
             concurrentRequests = XContentMapValues.nodeIntegerValue(indexSettings.get(CONCURRENT_REQUESTS), 1);
-            actionType = ActionType.fromValue(XContentMapValues.nodeStringValue(indexSettings.get(ACTION_TYPE),
-                    ActionType.INDEX.toValue()));
-            flushInterval = TimeValue.parseTimeValue(XContentMapValues.nodeStringValue(indexSettings.get(FLUSH_INTERVAL), "12h"), FLUSH_12H);
+            actionType = ActionType.fromValue(
+                    XContentMapValues.nodeStringValue(indexSettings.get(ACTION_TYPE), ActionType.INDEX.toValue()));
+            flushInterval = TimeValue.parseTimeValue(
+                    XContentMapValues.nodeStringValue(indexSettings.get(FLUSH_INTERVAL), "12h"), FLUSH_12H);
+            frequency = FrequencyType.fromValue(XContentMapValues.nodeStringValue(indexSettings.get(FREQUENCY),
+                    FrequencyType.NOT_FREQUENCY.toValue()));
         } else {
             indexName = riverName.name();
             typeName = "status";
@@ -104,23 +108,23 @@ public class RiverConfig {
             concurrentRequests = 1;
             actionType = ActionType.INDEX;
             flushInterval = FLUSH_12H;
+            frequency = FrequencyType.NOT_FREQUENCY;
         }
-        
+
         // Extract StatsD related configuration
         if (riverSettings.settings().containsKey("statsd")) {
             Map<String, Object> statsdSettings = (Map<String, Object>) riverSettings.settings().get("statsd");
             statsdHost = XContentMapValues.nodeStringValue(statsdSettings.get(STATSD_HOST), "localhost");
             statsdPrefix = XContentMapValues.nodeStringValue(statsdSettings.get(STATSD_PREFIX), "kafka_river");
             statsdPort = XContentMapValues.nodeIntegerValue(statsdSettings.get(STATSD_PORT), 8125);
-            statsdIntervalInSeconds = XContentMapValues.nodeIntegerValue(statsdSettings.get(STATSD_INTERVAL_IN_SECONDS), 10);
+            statsdIntervalInSeconds =
+                    XContentMapValues.nodeIntegerValue(statsdSettings.get(STATSD_INTERVAL_IN_SECONDS), 10);
         }
     }
 
     public enum ActionType {
 
-        INDEX("index"),
-        DELETE("delete"),
-        RAW_EXECUTE("raw.execute");
+        INDEX("index"), DELETE("delete"), RAW_EXECUTE("raw.execute");
 
         private String actionType;
 
@@ -133,10 +137,11 @@ public class RiverConfig {
         }
 
         public static ActionType fromValue(String value) {
-            if(value == null) throw new IllegalArgumentException();
+            if (value == null)
+                throw new IllegalArgumentException();
 
-            for(ActionType values : values()) {
-                if(value.equalsIgnoreCase(values.toValue()))
+            for (ActionType values : values()) {
+                if (value.equalsIgnoreCase(values.toValue()))
                     return values;
             }
 
@@ -145,8 +150,7 @@ public class RiverConfig {
     }
 
     public enum MessageType {
-        STRING("string"),
-        JSON("json");
+        STRING("string"), JSON("json");
 
         private String messageType;
 
@@ -159,14 +163,41 @@ public class RiverConfig {
         }
 
         public static MessageType fromValue(String value) {
-            if(value == null) throw new IllegalArgumentException();
+            if (value == null)
+                throw new IllegalArgumentException();
 
-            for(MessageType values : values()) {
-                if(value.equalsIgnoreCase(values.toValue()))
+            for (MessageType values : values()) {
+                if (value.equalsIgnoreCase(values.toValue()))
                     return values;
             }
 
             throw new IllegalArgumentException("MessageType with value " + value + " does not exist.");
+        }
+    }
+
+    public enum FrequencyType {
+        ONE_MONTH("1mon"), ONE_DAY("1day"), ONE_HOUR("1hour"), TEN_MINUTE("10min"), NOT_FREQUENCY("not");
+
+        private String frequencyType;
+
+        private FrequencyType(String frequencyType) {
+            this.frequencyType = frequencyType;
+        }
+
+        public String toValue() {
+            return frequencyType;
+        }
+
+        public static FrequencyType fromValue(String value) {
+            if (value == null)
+                throw new IllegalArgumentException();
+
+            for (FrequencyType values : values()) {
+                if (value.equalsIgnoreCase(values.toValue()))
+                    return values;
+            }
+
+            throw new IllegalArgumentException("FrequencyType with value " + value + " does not exist.");
         }
     }
 
@@ -206,8 +237,14 @@ public class RiverConfig {
         return actionType;
     }
 
-    TimeValue getFlushInterval() { return flushInterval; }
-    
+    TimeValue getFlushInterval() {
+        return flushInterval;
+    }
+
+    FrequencyType getFrequency() {
+        return frequency;
+    }
+
     String getStatsdHost() {
         return statsdHost;
     }
@@ -219,7 +256,7 @@ public class RiverConfig {
     int getStatsdPort() {
         return statsdPort;
     }
-    
+
     int getStatsdIntervalInSeconds() {
         return statsdIntervalInSeconds;
     }
