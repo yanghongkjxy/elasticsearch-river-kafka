@@ -45,7 +45,7 @@ public class RawMessageProducer extends ElasticSearchProducer {
         try {
             ByteBuffer byteBuffer = ByteBuffer.wrap(messageBytes);
             bulkProcessor.add(new ChannelBufferBytesReference(new ByteBufferBackedChannelBuffer(byteBuffer)),
-                    riverConfig.getIndexName(), getType());
+                    getIndex(), getType());
         } catch (Exception e) {
             e.printStackTrace();
         }

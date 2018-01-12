@@ -53,7 +53,7 @@ public class DeleteDocumentProducer extends ElasticSearchProducer {
             if (messageMap.containsKey("id")) {
                 String id = (String) messageMap.get("id");
 
-                final DeleteRequest request = Requests.deleteRequest(riverConfig.getIndexName()).type(getType()).id(id);
+                final DeleteRequest request = Requests.deleteRequest(getIndex()).type(getType()).id(id);
 
                 bulkProcessor.add(request);
             } else {

@@ -61,12 +61,11 @@ public class IndexDocumentProducer extends ElasticSearchProducer {
                 case STRING:
                     message = XContentFactory.jsonBuilder().startObject()
                             .field("value", new String(messageBytes, "UTF-8")).endObject().string();
-                    request = Requests.indexRequest(riverConfig.getIndexName()).type(riverConfig.getTypeName())
-                            .source(message);
+                    request = Requests.indexRequest(getIndex()).type(getType()).source(message);
                     break;
                 case JSON:
                     final Map<String, Object> messageMap = reader.readValue(messageBytes);
-                    request = Requests.indexRequest(riverConfig.getIndexName()).type(getType()).source(messageMap);
+                    request = Requests.indexRequest(getIndex()).type(getType()).source(messageMap);
             }
 
             bulkProcessor.add(request);

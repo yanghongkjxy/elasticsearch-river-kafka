@@ -108,17 +108,45 @@ public abstract class ElasticSearchProducer {
     }
 
     /**
-     * support active type by parameter frequency
+     * support active index by parameter frequency index
+     *
+     * @return index
+     * @author luanmingming
+     */
+    public String getIndex() {
+        String index = riverConfig.getIndexName();
+        if (riverConfig.getFrequencyIndex() == RiverConfig.FrequencyType.NOT_FREQUENCY) {
+            return index;
+        }
+        switch (riverConfig.getFrequencyIndex()) {
+            case ONE_MONTH:
+                index = TimeInterval.monthInterval();
+                break;
+            case ONE_DAY:
+                index = TimeInterval.dayInterval();
+                break;
+            case ONE_HOUR:
+                index = TimeInterval.hourInterval();
+                break;
+            case TEN_MINUTE:
+                index = TimeInterval.minuteInterval();
+                break;
+        }
+        return index;
+    }
+
+    /**
+     * support active type by parameter frequency tyoe
      * 
      * @return type
      * @author luanmingming
      */
     public String getType() {
-        String type = riverConfig.getIndexName();
-        if (riverConfig.getFrequency() == RiverConfig.FrequencyType.NOT_FREQUENCY) {
+        String type = riverConfig.getTypeName();
+        if (riverConfig.getFrequencyType() == RiverConfig.FrequencyType.NOT_FREQUENCY) {
             return type;
         }
-        switch (riverConfig.getFrequency()) {
+        switch (riverConfig.getFrequencyType()) {
             case ONE_MONTH:
                 type = TimeInterval.monthInterval();
                 break;

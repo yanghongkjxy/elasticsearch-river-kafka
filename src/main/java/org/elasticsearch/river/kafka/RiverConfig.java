@@ -42,7 +42,8 @@ public class RiverConfig {
     private static final String CONCURRENT_REQUESTS = "concurrent.requests";
     private static final String ACTION_TYPE = "action.type";
     private static final String FLUSH_INTERVAL = "flush.interval";
-    private static final String FREQUENCY = "frequency";
+    private static final String FREQUENCY_INDEX = "frequencyIndex";
+    private static final String FREQUENCY_TYPE = "frequencyType";
 
     /* StatsD config */
     private static final String STATSD_PREFIX = "prefix";
@@ -60,7 +61,8 @@ public class RiverConfig {
     private int concurrentRequests;
     private ActionType actionType;
     private TimeValue flushInterval;
-    private FrequencyType frequency;
+    private FrequencyType frequencyIndex;
+    private FrequencyType frequencyType;
 
     private String statsdPrefix;
     private String statsdHost;
@@ -99,7 +101,9 @@ public class RiverConfig {
                     XContentMapValues.nodeStringValue(indexSettings.get(ACTION_TYPE), ActionType.INDEX.toValue()));
             flushInterval = TimeValue.parseTimeValue(
                     XContentMapValues.nodeStringValue(indexSettings.get(FLUSH_INTERVAL), "12h"), FLUSH_12H);
-            frequency = FrequencyType.fromValue(XContentMapValues.nodeStringValue(indexSettings.get(FREQUENCY),
+            frequencyIndex = FrequencyType.fromValue(XContentMapValues
+                    .nodeStringValue(indexSettings.get(FREQUENCY_INDEX), FrequencyType.NOT_FREQUENCY.toValue()));
+            frequencyType = FrequencyType.fromValue(XContentMapValues.nodeStringValue(indexSettings.get(FREQUENCY_TYPE),
                     FrequencyType.NOT_FREQUENCY.toValue()));
         } else {
             indexName = riverName.name();
@@ -108,7 +112,8 @@ public class RiverConfig {
             concurrentRequests = 1;
             actionType = ActionType.INDEX;
             flushInterval = FLUSH_12H;
-            frequency = FrequencyType.NOT_FREQUENCY;
+            frequencyIndex = FrequencyType.NOT_FREQUENCY;
+            frequencyType = FrequencyType.NOT_FREQUENCY;
         }
 
         // Extract StatsD related configuration
@@ -241,8 +246,12 @@ public class RiverConfig {
         return flushInterval;
     }
 
-    FrequencyType getFrequency() {
-        return frequency;
+    FrequencyType getFrequencyIndex() {
+        return frequencyIndex;
+    }
+
+    FrequencyType getFrequencyType() {
+        return frequencyType;
     }
 
     String getStatsdHost() {
