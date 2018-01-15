@@ -42,8 +42,8 @@ public class RiverConfig {
     private static final String CONCURRENT_REQUESTS = "concurrent.requests";
     private static final String ACTION_TYPE = "action.type";
     private static final String FLUSH_INTERVAL = "flush.interval";
-    private static final String FREQUENCY_INDEX = "frequencyIndex";
-    private static final String FREQUENCY_TYPE = "frequencyType";
+    private static final String FREQUENCY_INDEX = "frequency.index";
+    private static final String FREQUENCY_TYPE = "frequency.type";
 
     /* StatsD config */
     private static final String STATSD_PREFIX = "prefix";
