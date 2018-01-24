@@ -26,7 +26,6 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.ESLoggerFactory;
-import org.elasticsearch.common.unit.TimeValue;
 
 import java.util.Map;
 import java.util.Set;
@@ -64,14 +63,13 @@ public abstract class ElasticSearchProducer {
             @Override
             public void beforeBulk(long executionId, BulkRequest request) {
                 stats.flushCount.incrementAndGet();
-                logger.info("Index: {}: Going to execute bulk request composed of {} actions.",
-                        riverConfig.getIndexName(), request.numberOfActions());
+                logger.info("Index: {}: Going to execute bulk request composed of {} actions.", getIndex(),
+                        request.numberOfActions());
             }
 
             @Override
             public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
-                logger.info("Index: {}: Executed bulk composed of {} actions.", riverConfig.getIndexName(),
-                        request.numberOfActions());
+                logger.info("Index: {}: Executed bulk composed of {} actions.", getIndex(), request.numberOfActions());
 
                 for (BulkItemResponse item : response.getItems()) {
                     if (item.isFailed()) {
@@ -89,7 +87,7 @@ public abstract class ElasticSearchProducer {
             @Override
             public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
                 stats.failed.addAndGet(request.numberOfActions());
-                logger.warn("Index: {}: Error executing bulk.", failure, riverConfig.getIndexName());
+                logger.warn("Index: {}: Error executing bulk.", failure, getIndex());
             }
         }).setBulkActions(riverConfig.getBulkSize()).setFlushInterval(riverConfig.getFlushInterval())
                 .setConcurrentRequests(riverConfig.getConcurrentRequests()).build();
@@ -119,6 +117,9 @@ public abstract class ElasticSearchProducer {
             return index;
         }
         switch (riverConfig.getFrequencyIndex()) {
+            case ONE_YEAR:
+                index = TimeInterval.yearInterval();
+                break;
             case ONE_MONTH:
                 index = TimeInterval.monthInterval();
                 break;
@@ -132,11 +133,11 @@ public abstract class ElasticSearchProducer {
                 index = TimeInterval.minuteInterval();
                 break;
         }
-        return index;
+        return riverConfig.getTopic() + "-" + index;
     }
 
     /**
-     * support active type by parameter frequency tyoe
+     * support active type by parameter frequency type
      * 
      * @return type
      * @author luanmingming
@@ -147,6 +148,9 @@ public abstract class ElasticSearchProducer {
             return type;
         }
         switch (riverConfig.getFrequencyType()) {
+            case ONE_YEAR:
+                type = TimeInterval.yearInterval();
+                break;
             case ONE_MONTH:
                 type = TimeInterval.monthInterval();
                 break;
@@ -162,4 +166,5 @@ public abstract class ElasticSearchProducer {
         }
         return type;
     }
+
 }

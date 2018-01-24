@@ -21,7 +21,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Requests;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Producer to delete documents. Creates delete document requests, which are executed with Bulk API.

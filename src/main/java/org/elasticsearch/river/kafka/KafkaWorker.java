@@ -19,14 +19,12 @@ import kafka.consumer.ConsumerIterator;
 import kafka.consumer.ConsumerTimeoutException;
 import kafka.consumer.KafkaStream;
 import kafka.message.MessageAndMetadata;
-import org.elasticsearch.common.collect.Sets;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.ESLoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * The worker thread, which does the actual job of consuming messages from kafka and passing those to Elastic Search

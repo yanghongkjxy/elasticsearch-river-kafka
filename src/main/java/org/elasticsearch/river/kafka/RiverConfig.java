@@ -181,7 +181,8 @@ public class RiverConfig {
     }
 
     public enum FrequencyType {
-        ONE_MONTH("1mon"), ONE_DAY("1day"), ONE_HOUR("1hour"), TEN_MINUTE("10min"), NOT_FREQUENCY("not");
+        ONE_YEAR("1year"), ONE_MONTH("1mon"), ONE_DAY("1day"), ONE_HOUR("1hour"), TEN_MINUTE("10min"),
+        NOT_FREQUENCY("not");
 
         private String frequencyType;
 

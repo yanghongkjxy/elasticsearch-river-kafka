@@ -21,11 +21,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.xcontent.XContentFactory;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * Producer to index documents. Creates index document requests, which are executed with Bulk API.

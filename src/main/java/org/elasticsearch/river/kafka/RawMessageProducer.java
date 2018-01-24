@@ -21,7 +21,6 @@ import org.elasticsearch.common.bytes.ChannelBufferBytesReference;
 import org.elasticsearch.common.netty.buffer.ByteBufferBackedChannelBuffer;
 
 import java.nio.ByteBuffer;
-import java.util.Set;
 
 /**
  * Producer to executed raw messages as bytes array directly using Bulk API.
